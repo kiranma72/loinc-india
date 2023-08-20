@@ -2,22 +2,36 @@ import React, { Component } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { useHistory } from "react-router-dom";
-import backgr from "./images/bcgr7.jpg"
+// import backgr from "./images/bcgr7.jpg"
+import { CSVLink } from 'react-csv';
+import './component.css';
 import filebackgr from "./images/filePic.png"
 import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
 import axios from 'axios';
-const testurl = "http://localhost:9191/FullTest/lucene";
+import './component.css';
+import Loginbutton from './Loginbutton';
+import Service from '../Service';
+import Tableform from './Tableform';
+import EditTest from './EditTest';
+const testurl = "http://localhost:9191/FullTest/lucene/";
+const editurl = "http://localhost:9191/FullTest/EditTest/";
 var tableid = 1
+
+var ar = [{ indianname: 'BASOPHILS', property: 'NFr', method: '', scale: 'Qn', long_COMMON_NAME: 'Basophils/100 leukocytes in Blood', method: "", percentage: 100, property: "NFr", scale: "Qn", shortname_: "Basophils/leuk NFr Bld", status_: "ACTIVE", system: "Bld", time_ASPCT: "Pt" }]
 class TestList extends Component {
   stingch = "";
+  editval = "";
   constructor(props) {
     super(props)
     this.state = {
-      testinginfo: [" "]
+      testinginfo: [],
+      edittestinginfo: [],
+      startedit: 'abc',
     }
     this.BulkTesting = this.BulkTesting.bind(this);
     this.SingleTest = this.SingleTest.bind(this);
     this.NewTests = this.NewTests.bind(this);
+    this.EditTests = this.EditTests.bind(this);
   }
   BulkTesting() {
     this.props.history.push('/bulkTest/');
@@ -31,14 +45,35 @@ class TestList extends Component {
   handleChange = event => {
     this.stingch = event.target.value;
   };
+  handleedit = event => {
+    this.editval = event.target.value;
+  };
 
+  EditTests(LOINCvalue) {
+    console.log("Setting the loinc code");
+    console.log(LOINCvalue);
+    console.log("Settingit");
+    Service.Setedittest(LOINCvalue);
+    this.props.history.push('/Edittest/');
+  }
+  editoperation = event => {
+    while (ar.length > 0) { ar.pop() }
+    axios.get(editurl + "" + this.editval).then((res) => {
+      //ar.push(res.data);
+      this.setState({ edittestinginfo: res.data });
+      console.log(res.data);
+    });
+    console.log("THe edit code is");
+    console.log(this.state.edittestinginfo);
+    console.log("The code is setup");
+  }
 
   handleclick = event => {
     if (this.stingch.trim().length !== 0) {
-      axios.get(testurl + "/" + encodeURIComponent(this.stingch)).then((res) => {
+      const encodeval = encodeURIComponent(this.stingch);
+      axios.get("http://localhost:9191/FullTest/lucene/", { params: { name: encodeval } }).then((res) => {
         this.setState({ testinginfo: res.data });
-        console.log(res.data);
-        console.log(this.testinginfo);
+        ar.push(res.data);
       }
       );
       console.log('value is:', event.target.value);
@@ -65,121 +100,95 @@ class TestList extends Component {
 
     return (console.log(tableid),
       <div >
+        {/* <Loginbutton /> */}
         <div style={{
-          backgroundImage: `url(${backgr})`, backgroundSize: "contain"
+          backgroundSize: "contain"
         }}>
-          <br></br>
+          {/* Csv file url */}
           <div className='container'>
-            <div className="row">
+            <div className="container">
+              <br></br>
+              <div className="row heading-buttons">
+                <button
+                  className="btn btn-light file-button"
+                  onClick={this.BulkTesting}
+                  style={{
+                    width: '100px',
+                    height: '55px',
+                    margin: '10px 20px 5px',
+                    backgroundImage: `url(${filebackgr})`,
+                    backgroundSize: '90px 40px',
+                    backgroundPosition: 'center',
+                    // backgroundSize: 'cover',
+                    border: "4px solid blue"
+                  }}
+                >
+                </button>
+                <button
+                  className="btn btn-light single-button"
+                  onClick={this.SingleTest}
+                >
+                  Single Test
+                </button>
+              </div>
             </div>
-            <br></br>
+
 
             {/* Test Search part */}
             <div className='row'>
-              <div className='col-4' >
-                <input className="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" placeholder="Write test name here "
+
+              <div className="search-bar">
+                <input
+                  className="form-control"
+                  placeholder="Search for a test..."
                   type="text"
                   id="message"
                   name="message"
                   onChange={this.handleChange}
-                  style={{
-                    backgroundColor: "lightpink",
-                    border: "2px solid blue"
-                  }}
-                /></div>
-              <div className='col-1'>  <button onClick={this.handleclick} className="btn btn-warning" style={{
-                backgroundColor: "lightgreen",
-                border: "2px solid blue"
-              }}>Search.</button></div>
-
-              {/* Csv file input */}
+                />
+                <button
+                  onClick={this.handleclick}
+                  className="btn btn-warning search-button"
+                >
+                  Search
+                </button>
+              </div>
             </div>
-            <div className='row'>
-              <button className="btn btn-light" onClick={this.BulkTesting}
-                style={{
-                  width: '120px',
-                  height: '45px',
-                  margin: '10px 20px 10px',
-                  backgroundImage: `url(${filebackgr})`,
-                  backgroundPosition: 'center',
-                  backgroundSize: 'cover',
 
-                  border: "3px solid red"
-                }}
-              ></button>
-              <button className="btn btn-light" onClick={this.SingleTest}
-                style={{
-                  backgroundPosition: 'center',
-                  backgroundSize: 'cover', backgroundColor: 'lightblue',
-                  margin: '10px 10px 20px',
-                  border: "4px solid blue"
-                }}
-              > Single Test</button>
-              <button className="btn btn-light" onClick={this.NewTests}
-                style={{
-                  backgroundPosition: 'center', backgroundColor: 'lightblue',
-                  backgroundSize: 'cover',
-                  margin: '10px 10px 20px',
-                  border: "4px solid blue"
-                }}
-              > Add New Tests</button>
-            </div>
+
+
 
           </div>
+
+          <div className="button-container">
+            <input
+              className="form-control edit-input"
+              placeholder="LOINC-Code "
+              type="text"
+              id="message"
+              name="message"
+              onChange={this.handleedit}
+            />
+
+            <button
+              onClick={this.editoperation}
+              className="btn btn-warning edit-button"
+            >
+              Add/Delete
+            </button>
+          </div>
+
+
         </div>
         <br></br>
+        <EditTest editinfo={this.state.edittestinginfo} />
+        <Tableform testing={this.state.testinginfo} />
+        {/* {checkingshow == 'abc' ? <Editdata testing={this.state.testinginfo} /> : console.log("Not equal")} */}
 
-        {/* table is starting  */}
-        <div className="row">
-          <table className="table table-bordered" style={{ margin: "10px 15px 15px" }}>
-            <thead>
-              <tr className="table-info" style={{
-                backgroundColor: "red",
-                border: "6px solid pink"
-              }}>
-                <th>Confidence (%)</th>
-                <th >Indian name</th>
-                <th>LOINC code </th>
-                <th>Component</th>
-                <th>Property</th>
-                <th>Time Aspct</th>
-                <th>System</th>
-                <th>Scale</th>
-                <th>Method</th>
-                <th>Class</th>
-                <th>Classtype</th>
-                <th>Long Common Name</th>
-                <th >Short Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                this.state.testinginfo.map(
-                  tst =>
-                    <tr key={tableid++}
-                      className={this.checkrange(tst.percentage)}
-                    >
-                      <td>{tst.percentage}</td>
-                      <td>{tst.indianname}</td>
-                      <td>{tst.loincCode}</td>
-                      <td>{tst.component}</td>
-                      <td>{tst.property}</td>
-                      <td>{tst.time_ASPCT}</td>
-                      <td>{tst.system}</td>
-                      <td>{tst.scale}</td>
-                      <td>{tst.method}</td>
-                      <td>{tst.class_}</td>
-                      <td>{tst.classtype_}</td>
-                      <td>{tst.long_COMMON_NAME}</td>
-                      <td>{tst.shortname_}</td>
-                    </tr>
-                )
-              }
-
-            </tbody>
-
-          </table>
-        </div>
+        {/* style={{
+                                backgroundColor: "red",
+                                border: "6px solid pink"
+                            }} */}
       </div>
     )
   }

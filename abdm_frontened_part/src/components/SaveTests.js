@@ -29,14 +29,14 @@ export default class SaveTests extends Component {
         {/* <div className="col-1"> */}
         <button className="btn btn-light" onClick={this.BulkTesting}
           style={{
-            width: '120px',
+            width: '100px',
             height: '45px',
             margin: '10px 20px 10px',
             backgroundImage: `url(${filebackgr})`,
+            backgroundSize: '90px 40px',
             backgroundPosition: 'center',
-            backgroundSize: 'cover',
-
-            border: "3px solid red"
+            // backgroundSize: 'cover',
+            border: "4px solid blue"
           }}
         ></button>
         {/* </div> */}

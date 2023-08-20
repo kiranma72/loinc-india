@@ -1,6 +1,9 @@
 package com.example.MapIt.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
@@ -15,13 +18,16 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.MapIt.LuceneService.Indexer;
 import com.example.MapIt.LuceneService.SearchServiceLucene;
 import com.example.MapIt.repo.IndianTestRepo;
 import com.example.MapIt.repo.LoincRepo;
 import com.example.MapIt.repo.SearchRepo;
 import com.example.MapIt.tests.BulkTest;
+import com.example.MapIt.tests.Editinfo;
 import com.example.MapIt.tests.Forsorting;
 import com.example.MapIt.tests.FullTest;
 import com.example.MapIt.tests.LoincTest;
@@ -109,9 +115,11 @@ public class FullTestOutputController {
 	    	return findbysearchClass(searchtests);
 	     }
 	  
-	  @GetMapping("/lucene/{id}")
-	    public List<FullTest> findbyLucene(@PathVariable String id){  System.out.println(id);
-		  id=id.trim();
+	  @GetMapping("/lucene/")
+	    public List<FullTest> findbyLucene(@RequestParam("name") String testtofind){  System.out.println(testtofind);
+	     
+	    testtofind=testtofind.trim();
+		  String id =decodeValue(testtofind);
 		  if(id==null) {System.out.println("an empty string is called");
 			  return new ArrayList<>();
 		  }
@@ -156,6 +164,7 @@ public class FullTestOutputController {
 	    	
 	    	return findbysearchClass(searchtests);
 	     }
+	  
 	  
 	  
 	  public List<FullTest> findbysearchClass(List<SearchClass>lt){
@@ -279,12 +288,13 @@ public class FullTestOutputController {
 		  return tests;
 	  }
 	  
-	  @GetMapping("/bulktest/{id}")
-	    public List<BulkTest> findbyBulkpath(@PathVariable String id){  System.out.println(id);
-		  id=id.trim();
-		  if(id==null) {System.out.println("an empty string is called");
+	  @GetMapping("/bulktest/")
+	    public List<BulkTest> findbyBulkpath(@RequestParam("name") String testtofind){  System.out.println(testtofind);
+	    testtofind=testtofind.trim();
+		  if(testtofind==null) {System.out.println("an empty string is called");
 			  return new ArrayList<>();
 		  }
+		  String id=decodeValue(testtofind);
 		  SearchServiceLucene ssl=new SearchServiceLucene();
 	   List<SearchClass> searchtests=new ArrayList<>();
 	   StringTokenizer ids =new StringTokenizer(id," ");
@@ -323,6 +333,69 @@ public class FullTestOutputController {
 	    		 ans.add(bt);
 	    		 }
 	    	 return ans;
+	     }
+	  
+	  public static String decodeValue(String value) {
+	        try {
+	            return URLDecoder.decode(value, StandardCharsets.UTF_8.toString());
+	        } catch (UnsupportedEncodingException ex) {
+	            throw new RuntimeException(ex.getCause());
+	        }
+	    }
+	  
+	  @GetMapping("/EditTest/{id}")
+	    public List<Editinfo> findbyEditTest( @PathVariable String id){  
+		  if(id==null) {System.out.println("an empty string is called");
+			  return new ArrayList<>();
+		  }	List<Editinfo>edittests=new ArrayList<>();
+	    	List<SearchClass>testtoanalyze=sp.findByLoinccode(id);
+	    	for(SearchClass test:testtoanalyze) {
+	    		Editinfo et=new Editinfo(test.getLoinccode(),test.getIndianname());
+	    		edittests.add(et);
+	    	}
+	    	System.out.println("Edit list is processed");
+	    return edittests;
+	     }
+	   @GetMapping("/savetest")
+	    public String saveit(@RequestParam("code")String loinccode,@RequestParam("name")String indianname){
+	    	System.out.println("the new test with loincode"+loinccode+" and name"+indianname);
+           Optional<LoincTest> newlt=loincrepo.findById(loinccode);
+           if(newlt.isPresent()) {
+           	LoincTest newLT=newlt.get();
+           	SearchClass scl=new SearchClass();
+           	scl.setIndianname(indianname);
+           	scl.setLoinccode(loinccode);
+           	scl.setMethodused(newLT.getMETHOD_TYP());
+           	scl.setSpecimentype(newLT.getSYSTEM_());
+           	scl.setPhoneticindianname(getphonetic(indianname));
+           	scl.setPhoneticmethodused(getphonetic(newLT.getMETHOD_TYP()));
+           	scl.setPhoneticspecimentype(newLT.getSYSTEM_());
+           	sp.save(scl);
+           	Indexer idr=new Indexer();
+           	try {
+					idr.indexTest(sp.findAll());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+           
+           }
+           
+	    	return "Done";
+	    	}
+	   @GetMapping("/DeleteTest/")
+	    public void DeleteTest( @RequestParam("name") String id){  
+		  if(id==null) {System.out.println("an empty string is called"); }
+		 System.out.println("found data to delete is ="+ sp.findById(id));
+		 System.out.println(id);
+		  sp.deleteById(id);
+		  Indexer idr=new Indexer();
+     	try {
+				idr.indexTest(sp.findAll());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	     }
 }
 	  

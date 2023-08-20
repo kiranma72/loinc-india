@@ -13,11 +13,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.MapIt.LuceneService.Indexer;
@@ -28,7 +30,7 @@ import com.example.MapIt.repo.SearchRepo;
 import com.example.MapIt.tests.IndianTest;
 import com.example.MapIt.tests.LoincTest;
 import com.example.MapIt.tests.SearchClass;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/IndianTest")
 public class IndianTestController {
@@ -38,8 +40,8 @@ public class IndianTestController {
     private IndianTestRepo indianrepo;
 	@Autowired
     private LoincRepo loincrepo;
-	 @Autowired
-     private SearchRepo sp;
+	@Autowired
+    private SearchRepo sp;
 //   To fetch data from the csv file and store it to database
 	 @Autowired
 	    private JobLauncher jobLauncher;
@@ -75,30 +77,6 @@ public class IndianTestController {
 	    	return "Deletion is Done";
 	    	}
 	  //functions to save new test 
-	    @PostMapping("/saveit")
-	    public IndianTest saveit(@RequestBody IndianTest it){ 
-	    	System.out.println(it.toString());
-            Optional<LoincTest> newlt=loincrepo.findById(it.getLOINC_Code());
-            if(newlt.isPresent()) {
-            	LoincTest newLT=newlt.get();
-            	SearchClass scl=new SearchClass();
-            	scl.setIndianname(it.getAliases_());
-            	scl.setLoinccode(it.getLOINC_Code());
-            	scl.setMethodused(newLT.getMETHOD_TYP());
-            	scl.setSpecimentype(newLT.getSYSTEM_());
-            	scl.setPhoneticindianname(getphonetic(it.getAliases_()));
-            	scl.setPhoneticmethodused(getphonetic(newLT.getMETHOD_TYP()));
-            	scl.setPhoneticspecimentype(newLT.getSYSTEM_());
-            	sp.save(scl);
-            	Indexer idr=new Indexer();
-            	try {
-					idr.indexTest();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            
-            }
-	    	return indianrepo.save(it);
-	    	}
+	 
+	   
 }

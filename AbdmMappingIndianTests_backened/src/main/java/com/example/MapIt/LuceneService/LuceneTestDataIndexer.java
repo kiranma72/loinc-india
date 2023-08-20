@@ -65,7 +65,7 @@ public class LuceneTestDataIndexer {
 	}
 	private Document createDocument(Tests test) throws IOException {
 		IndexableField id = new StoredField(LOINC_CODE, String.valueOf(test.getLoinccode()));
-		IndexableField indianname = new TextField(NAME, test.getIndianname()+" "+"%%%%%"+" "+test.getPhonecticIn()+" "+"%%%%%"+" "+test.getMethodused()+" "+"%%%%%"+" "+test.getPhonecticmt()+" "+"%%%%%"+" "+test.getPhonecticlc()+" "+"%%%%%"+" "+test.getSpecimentype(),Store.YES);
+		IndexableField indianname = new TextField(NAME, test.getIndianname()+" "+"%%%%%"+" "+test.getPhonecticIn()+" "+"%%%%%"+" "+test.getMethodused()+" "+"%%%%%"+" "+test.getPhonecticmt()+" "+"%%%%%"+" "+test.getPhonecticlc()+" "+"%%%%%"+" "+test.getSpecimentype()+" "+"%%%%%"+" "+test.getLoinccode(),Store.YES);
 		IndexableField methodused = new StoredField(METHODUSED, test.getMethodused());
 		IndexableField specimentype = new StoredField(SPECIMENTYPE, String.valueOf(test.getSpecimentype()));
 		Document doc = new Document();

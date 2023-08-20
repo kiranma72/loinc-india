@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import filebackgr from "./images/filePic.png"
+import filebackgr from "./images/file_import2.png"
 import BulkTest from './BulkTest'
 export default class CsvTest extends Component {
   constructor(props) {
@@ -27,13 +27,14 @@ export default class CsvTest extends Component {
           {/* <div className="col-1"> */}
           <button className="btn btn-light" onClick={this.BulkTesting}
             style={{
-              width: '120px',
+              width: '100px',
               height: '45px',
               margin: '10px 20px 10px',
               backgroundImage: `url(${filebackgr})`,
+              backgroundSize: '90px 40px',
               backgroundPosition: 'center',
-              backgroundSize: 'cover',
-              border: "3px solid red"
+              // backgroundSize: 'cover',
+              border: "4px solid blue"
             }}
           ></button>
           {/* </div> */}

@@ -21,10 +21,9 @@ const headers = [
 ];
 
 const testurl = "http://localhost:9191/FullTest/bulktest";
-
+var testdata = [];
 function BulkTest() {
   const [tests, setTests] = useState([]);
-
   const handleFile = async (event) => {
     Papa.parse(event.target.files[0], {
       header: true,
@@ -32,13 +31,23 @@ function BulkTest() {
       complete: async (result) => {
         const valuesArray = result.data.map((d) => Object.values(d).join(''));
         const newTests = await Promise.all(valuesArray.map(onSearchClick));
+        csvdataPrep(newTests);
         setTests(newTests);
+        console.log(newTests);
       }
     });
   };
+  const csvdataPrep = (alltests) => {
+    for (let t = 0; t < alltests.length; t++) {
+      for (let g = 0; g < alltests[t].length; g++) {
+        testdata.push(alltests[t][g]);
+      }
+    }
+  }
 
   const onSearchClick = async (testValue) => {
-    const response = await axios.get(testurl + "/" + encodeURIComponent(testValue));
+    const encodeval = encodeURIComponent(testValue);
+    const response = await axios.get("http://localhost:9191/FullTest/bulktest/", { params: { name: encodeval } });
     return response.data;
   };
   const checkrange = (val) => {
@@ -54,12 +63,12 @@ function BulkTest() {
     <div className="App">
       <div className='row'>
         <input type='file' name='file' accept='.csv' onChange={handleFile}
-          style={{ display: "block", margin: "10px auto", border: "4px solid blue", backgroundColor: "lightgreen" }}>
+          style={{ display: "block", margin: "10px 180px 20px ", border: "4px solid blue", backgroundColor: "lightgreen" }}>
         </input>
-        <CSVLink data={tests} headers={headers} filename="parents.csv">
-          <button className="btn btn-primary mb-2">Export</button>
+        <CSVLink data={testdata} headers={headers} filename="TestResults.csv" style={{ margin: "1px 10px auto", backgroundColor: "lightgreen" }} >
+          <button className="btn btn-primary mb-2">Download CSV File </button>
         </CSVLink></div>
-      <table className="table table-bordered" style={{ margin: "10px 15px 15px" }}>
+      <table className="table table-bordered" style={{ margin: "10px auto" }}>
         <thead>
           <tr className="table-info" style={{
             backgroundColor: "red",

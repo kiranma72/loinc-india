@@ -8,6 +8,7 @@ import com.example.MapIt.tests.SearchClass;
 
 public interface SearchRepo extends JpaRepository<SearchClass,String> {
   public List<SearchClass> findByMethodused(String method);
+  public List<SearchClass> findByLoinccode(String method);
   public List<SearchClass> findBySpecimentype(String specimentype);
   public List<SearchClass> findByPhoneticindianname(String phoneticindianname);
   public List<SearchClass> findByPhoneticspecimentype(String phoneticspecimentype);
