@@ -21,14 +21,12 @@ public class SearchServiceLucene {
 
 	int threshold = 100;
 	public List<SearchClass> search( @PathVariable  String id) throws IOException {
-		System.out.println("starting the test686");
+		//System.out.println("starting the test686");
 		String searchQuery = id;
 		searcher = new LuceneTestDataSearcher(Indexer.PATH, limit, threshold);
 		Map<String,Object> tests = (Map<String, Object>) searcher.searchDocumentsWithFacets(new TestQuery(searchQuery, Arrays.asList("indianname","methodused","specimentype")));
 		List<Tests> testsList = (List<Tests>) tests.get(LuceneTestDataSearcher.RESULT);
-		if(testsList!=null){
-			testsList.stream().forEach(System.out::println);
-		}
+
 		List<SearchClass>scl=new ArrayList<>();
 		for(Tests test:testsList) {
 			SearchClass searchclass =new SearchClass();
@@ -43,8 +41,9 @@ public class SearchServiceLucene {
 			searchclass.setIndianname(indianname);
 			scl.add(searchclass);
 		}
-		System.out.println("completed the search");
+	   	//System.out.println("completed the search");
+	   	System.out.println("tests.facets=="+tests.get(LuceneTestDataSearcher.FACETS));
 		return scl;
-		//System.out.println(tests.get(LuceneTestDataSearcher.FACETS));
+		
 	}
 }

@@ -38,12 +38,12 @@ public class LuceneTestDataIndexer {
 		facetsConfig.setRequireDimCount(LuceneTestDataIndexer.GENRES,true);
 	}
 
-	public LuceneTestDataIndexer(String directoryPath) {System.out.println("yes the indexer is called ");
+	public LuceneTestDataIndexer(String directoryPath) {//System.out.println("yes the indexer is called ");
 		path = Paths.get(directoryPath);
 	}
 
 	public void index(List<Tests> movies) throws IOException {
-		System.out.println("Now starting the indexing part ");
+	    System.out.println("Now starting the indexing part ");
 		Directory dir = FSDirectory.open(path);
 		
 		Analyzer analyzer = new StandardAnalyzer();
@@ -54,7 +54,7 @@ public class LuceneTestDataIndexer {
 		addDocument(movies.iterator(), writer);
 		writer.commit();
 		writer.close();
-		System.out.println("Now ending the indexing part ");
+		//System.out.println("Now ending the indexing part ");
 		
 	}
 	
@@ -65,7 +65,7 @@ public class LuceneTestDataIndexer {
 	}
 	private Document createDocument(Tests test) throws IOException {
 		IndexableField id = new StoredField(LOINC_CODE, String.valueOf(test.getLoinccode()));
-		IndexableField indianname = new TextField(NAME, test.getIndianname()+" "+"%%%%%"+" "+test.getPhonecticIn()+" "+"%%%%%"+" "+test.getMethodused()+" "+"%%%%%"+" "+test.getPhonecticmt()+" "+"%%%%%"+" "+test.getPhonecticlc()+" "+"%%%%%"+" "+test.getSpecimentype()+" "+"%%%%%"+" "+test.getLoinccode(),Store.YES);
+		IndexableField indianname = new TextField(NAME, test.getIndianname()+" "+"%%%%%"+" "+test.getPhonecticIn()+" "+"%%%%%"+" "+test.getMethodused()+" "+"%%%%%"+" "+test.getPhonecticmt()+" "+"%%%%%"+" "+test.getPhonecticlc()+" "+"%%%%%"+" "+test.getSpecimentype(),Store.YES);
 		IndexableField methodused = new StoredField(METHODUSED, test.getMethodused());
 		IndexableField specimentype = new StoredField(SPECIMENTYPE, String.valueOf(test.getSpecimentype()));
 		Document doc = new Document();

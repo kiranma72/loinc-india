@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.MapIt.LuceneService.Indexer;
 import com.example.MapIt.LuceneService.SearchServiceLucene;
+import com.example.MapIt.repo.Email;
 import com.example.MapIt.repo.IndianTestRepo;
 import com.example.MapIt.repo.LoincRepo;
 import com.example.MapIt.repo.SearchRepo;
@@ -30,6 +31,7 @@ import com.example.MapIt.tests.BulkTest;
 import com.example.MapIt.tests.Editinfo;
 import com.example.MapIt.tests.Forsorting;
 import com.example.MapIt.tests.FullTest;
+import com.example.MapIt.tests.IDstore;
 import com.example.MapIt.tests.LoincTest;
 import com.example.MapIt.tests.SearchClass;
 
@@ -40,7 +42,10 @@ import com.example.MapIt.tests.SearchClass;
 public class FullTestOutputController {
 	     @Autowired
 	     private SearchRepo sp;
-	   
+	     
+	     @Autowired
+	     private Email em;
+	     
 	     @Autowired
 	     private LoincRepo loincrepo;
 	     
@@ -70,50 +75,6 @@ public class FullTestOutputController {
 		  Soundex soundex = new Soundex();
 			return soundex.encode(input);
 	  }
-	  @GetMapping("/findbymethod/{id}")
-	    public List<FullTest> findbymthod(@PathVariable String id){ 
-  	   List<SearchClass>searchtests=new ArrayList<>();
-	    	System.out.println(id);
-	    	List<SearchClass>op=sp.findByMethodused(id);
-	    	if(op.size()>0) {
-	    		searchtests.addAll(op);
-	    	}
-	    	else {
-	    		List<SearchClass>lt=sp.findByPhoneticmethodused(getphonetic(id));
-	             for(SearchClass test:lt) {
-	            	 if((test.getIndianname()).equals(id)) {
-	            		 searchtests.add(0, test);
-	            	 }
-	            	 else {
-	            		 searchtests.add(test);
-	            	 }
-	             }
-	    	}
-	    	
-	    	return findbysearchClass(searchtests);
-	     }
-	  @GetMapping("/findbyspecimen/{id}")
-	    public List<FullTest> findbySpecimen(@PathVariable String id){ 
-  	   List<SearchClass>searchtests=new ArrayList<>();
-	    	System.out.println(id);
-	    	List<SearchClass>op=sp.findBySpecimentype(id);
-	    	if(op.size()>0) {
-	    		searchtests.addAll(op);
-	    	}
-	    	else {
-	    		List<SearchClass>lt=sp.findByPhoneticspecimentype(getphonetic(id));
-	             for(SearchClass test:lt) {
-	            	 if((test.getIndianname()).equals(id)) {
-	            		 searchtests.add(0, test);
-	            	 }
-	            	 else {
-	            		 searchtests.add(test);
-	            	 }
-	             }
-	    	}
-	    	
-	    	return findbysearchClass(searchtests);
-	     }
 	  
 	  @GetMapping("/lucene/")
 	    public List<FullTest> findbyLucene(@RequestParam("name") String testtofind){  System.out.println(testtofind);
@@ -140,32 +101,8 @@ public class FullTestOutputController {
 		   System.out.println(searchtests);
 	   }
 	    	return (getfirstten(searchtests,id));
-	     }
-	  
-	  @GetMapping("/findbymethodAnddspecimen/{id}/{id2}")
-	    public List<FullTest> findbyMethodAndSpecimen(@PathVariable String id,@PathVariable String id2){ 
-	   List<SearchClass>searchtests=new ArrayList<>();
-	    	System.out.println(id);
-	    	List<SearchClass>op=sp.findByMethodusedAndSpecimentype(id,id2);
-	    	if(op.size()>0) {
-	    		searchtests.addAll(op);
-	    	}
-	    	else {
-	    		List<SearchClass>lt=sp.findByPhoneticmethodusedAndPhoneticspecimentype(getphonetic(id),getphonetic(id2));
-	             for(SearchClass test:lt) {
-	            	 if((test.getIndianname()).equals(id)) {
-	            		 searchtests.add(0, test);
-	            	 }
-	            	 else {
-	            		 searchtests.add(test);
-	            	 }
-	             }
-	    	}
-	    	
-	    	return findbysearchClass(searchtests);
-	     }
-	  
-	  
+	     }  
+
 	  
 	  public List<FullTest> findbysearchClass(List<SearchClass>lt){
 		  List<FullTest>tests=new ArrayList<>();
@@ -245,7 +182,8 @@ public class FullTestOutputController {
   return tests;
 	  }
 	  
-	  public List<String> getALLstrings(String s) {List<String>allid=new ArrayList<>();
+	  public List<String> getALLstrings(String s) {
+		  List<String>allid=new ArrayList<>();
           if(s==null) {
         	  return allid;
           }
@@ -359,6 +297,8 @@ public class FullTestOutputController {
 	   @GetMapping("/savetest")
 	    public String saveit(@RequestParam("code")String loinccode,@RequestParam("name")String indianname){
 	    	System.out.println("the new test with loincode"+loinccode+" and name"+indianname);
+	    	indianname=decodeValue(indianname);
+	    	if(sp.findById(indianname).isEmpty()) {
            Optional<LoincTest> newlt=loincrepo.findById(loinccode);
            if(newlt.isPresent()) {
            	LoincTest newLT=newlt.get();
@@ -379,14 +319,18 @@ public class FullTestOutputController {
 					e.printStackTrace();
 				}
            
+           } 
            }
-           
+	    	else {
+	    		System.out.println("The name already exist");
+	    	}
 	    	return "Done";
 	    	}
+	  
 	   @GetMapping("/DeleteTest/")
 	    public void DeleteTest( @RequestParam("name") String id){  
 		  if(id==null) {System.out.println("an empty string is called"); }
-		 System.out.println("found data to delete is ="+ sp.findById(id));
+		  id=decodeValue(id);
 		 System.out.println(id);
 		  sp.deleteById(id);
 		  Indexer idr=new Indexer();
@@ -397,5 +341,22 @@ public class FullTestOutputController {
 				e.printStackTrace();
 			}
 	     }
+	   
+	   
+	   public void saveemail() {
+		    IDstore id1=new IDstore("bt20eee008@nituk.ac.in");
+		    em.save(id1);
+	   }
+	   
+	   @GetMapping("/check/{id}")
+	    public String Checkid( @PathVariable String id){ 
+		   System.out.println(id);
+		     //saveemail();
+		     if(em.findById(id).isPresent()) {System.out.println("rightid matched");
+		    	 return "Yes";}
+		     return "not";
+		 
+	     }
+	   
 }
 	  

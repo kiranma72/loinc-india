@@ -47,14 +47,7 @@ export default class CsvTest extends Component {
               border: "4px solid blue"
             }}
           > Single Test</button>
-          <button className="btn btn-light" onClick={this.NewTests}
-            style={{
-              backgroundPosition: 'center',
-              backgroundSize: 'cover', backgroundColor: 'lightblue',
-              margin: '10px 10px 20px',
-              border: "4px solid blue"
-            }}
-          > Add New Tests</button>
+
           {/* </div>  */}
         </div>
         <BulkTest />

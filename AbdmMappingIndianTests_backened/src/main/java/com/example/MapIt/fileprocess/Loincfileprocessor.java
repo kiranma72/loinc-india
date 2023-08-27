@@ -9,7 +9,6 @@ public class Loincfileprocessor implements ItemProcessor<LoincTest,LoincTest> {
 
     @Override
     public LoincTest process(LoincTest test) throws Exception {
-
     	return test ;
 }
 }

@@ -33,7 +33,6 @@ function BulkTest() {
         const newTests = await Promise.all(valuesArray.map(onSearchClick));
         csvdataPrep(newTests);
         setTests(newTests);
-        console.log(newTests);
       }
     });
   };

@@ -2,18 +2,19 @@ import React, { Component } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { useHistory } from "react-router-dom";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import backgr from "./images/bcgr7.jpg"
+import jwt_decode from "jwt-decode";
 import { CSVLink } from 'react-csv';
 import './component.css';
 import filebackgr from "./images/filePic.png"
 import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import './component.css';
-import Loginbutton from './Loginbutton';
-import Service from '../Service';
 import Tableform from './Tableform';
 import EditTest from './EditTest';
-const testurl = "http://localhost:9191/FullTest/lucene/";
+import { useAuth0 } from '@auth0/auth0-react';
+const checkid = "http://localhost:9191/FullTest/check/";
 const editurl = "http://localhost:9191/FullTest/EditTest/";
 var tableid = 1
 
@@ -27,20 +28,18 @@ class TestList extends Component {
       testinginfo: [],
       edittestinginfo: [],
       startedit: 'abc',
+      loginid: 'a',
+      correctid: "No"
     }
     this.BulkTesting = this.BulkTesting.bind(this);
     this.SingleTest = this.SingleTest.bind(this);
-    this.NewTests = this.NewTests.bind(this);
-    this.EditTests = this.EditTests.bind(this);
   }
+
   BulkTesting() {
     this.props.history.push('/bulkTest/');
   }
   SingleTest() {
     this.props.history.push('/');
-  }
-  NewTests() {
-    this.props.history.push('/NewTests/');
   }
   handleChange = event => {
     this.stingch = event.target.value;
@@ -48,26 +47,63 @@ class TestList extends Component {
   handleedit = event => {
     this.editval = event.target.value;
   };
-
-  EditTests(LOINCvalue) {
-    console.log("Setting the loinc code");
-    console.log(LOINCvalue);
-    console.log("Settingit");
-    Service.Setedittest(LOINCvalue);
-    this.props.history.push('/Edittest/');
-  }
-  editoperation = event => {
-    while (ar.length > 0) { ar.pop() }
-    axios.get(editurl + "" + this.editval).then((res) => {
-      //ar.push(res.data);
-      this.setState({ edittestinginfo: res.data });
-      console.log(res.data);
+  handleDeleteRow = (targetvalue) => {
+    const target = encodeURIComponent(targetvalue);
+    axios.get("http://localhost:9191/FullTest/DeleteTest/", {
+      params: { name: target }
+    })
+    const filteredArray = this.state.edittestinginfo.filter((item, index) => item.indianname !== targetvalue);
+    this.setState({
+      edittestinginfo: filteredArray,
     });
-    console.log("THe edit code is");
-    console.log(this.state.edittestinginfo);
-    console.log("The code is setup");
+  };
+
+
+  editoperation = async event => {
+    console.log("The checking is proceeding");
+    console.log(this.state.loginid);
+
+    try {
+      const response = await axios.get(checkid + "" + this.state.loginid);
+      const correctid = response.data;
+
+      console.log(this.state.loginid);
+
+      if (correctid === "Yes") {
+        const res = await axios.get(editurl + "" + this.editval);
+        const updatedEdittestinginfo = res.data;
+
+        this.setState({
+          edittestinginfo: updatedEdittestinginfo,
+          correctid: correctid
+        }, () => {
+          console.log("Updated edittestinginfo:", this.state.edittestinginfo);
+          // Now you can perform further actions with updatedEdittestinginfo
+        });
+      } else {
+        this.setState({ correctid: "No" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
 
+  addalias = (addtest) => {
+    if (addtest) {
+      const encodeval = encodeURIComponent(addtest);
+      const loincvalue = this.editval;
+      if (loincvalue !== "") {
+        axios.get("http://localhost:9191/FullTest/savetest/", {
+          params: { name: encodeval, code: loincvalue }
+        })
+      }
+      axios.get(editurl + "" + this.editval).then((res) => {
+        this.setState({ edittestinginfo: res.data });
+        console.log(res.data);
+      });
+    }
+
+  }
   handleclick = event => {
     if (this.stingch.trim().length !== 0) {
       const encodeval = encodeURIComponent(this.stingch);
@@ -89,12 +125,7 @@ class TestList extends Component {
       return 'bg-danger';
     }
   }
-  onsearchclick() {
-    axios.get(testurl + "/" + "").then((res) => {
-      this.setState({ testinginfo: res.data });
-    }
-    );
-  }
+
 
   render() {
 
@@ -106,6 +137,19 @@ class TestList extends Component {
         }}>
           {/* Csv file url */}
           <div className='container'>
+            <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "900px", paddingRight: "20px" }}>
+              <GoogleOAuthProvider
+                clientId="572493508359-p9ecfavakbksmm6j53hei1ntot9cintk.apps.googleusercontent.com"
+                style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+                <GoogleLogin onSuccess={credentialResponse => {
+                  var decoded = jwt_decode(credentialResponse.credential);
+                  this.setState({ loginid: decoded.email })
+                }}
+                  onError={() => {
+                    console.log('Login Failed');
+                  }}
+                />Login</GoogleOAuthProvider>;
+            </div>
             <div className="container">
               <br></br>
               <div className="row heading-buttons">
@@ -181,14 +225,18 @@ class TestList extends Component {
 
         </div>
         <br></br>
-        <EditTest editinfo={this.state.edittestinginfo} />
         <Tableform testing={this.state.testinginfo} />
-        {/* {checkingshow == 'abc' ? <Editdata testing={this.state.testinginfo} /> : console.log("Not equal")} */}
+        {this.state.correctid === "Yes" ? <EditTest editinfo={this.state.edittestinginfo} deleteRow={this.handleDeleteRow} addalias={this.addalias} /> : <><p style={{
+          fontSize: '18px',
+          color: 'red',
+          textAlign: 'center',
+          margin: '20px'
+        }}>
+          Please Login first to Add/Delete an Alias
+        </p></>
+        }
 
-        {/* style={{
-                                backgroundColor: "red",
-                                border: "6px solid pink"
-                            }} */}
+
       </div>
     )
   }
