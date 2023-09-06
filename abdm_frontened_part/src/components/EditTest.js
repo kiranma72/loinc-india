@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
-import filebackgr from "./images/filePic.png"
 import axios from 'axios'
-import HeaderComponent from './HeaderComponent';
-import SaveTests from './SaveTests';
 import './component.css';
-
+import deletelogo from './images/deleteimg.png'
 const initialise = 2;
 var addtest = ""
 export default class EditTest extends Component {
@@ -42,7 +39,7 @@ export default class EditTest extends Component {
                 }}>
 
                     <div className="table-container">
-                        <table className="table table-bordered custom-table" style={{ margin: "10px 10px 20px " }}>
+                        <table className="table table-bordered custom-table">
                             <thead className="custom-thead">
                                 <tr style={{
                                     backgroundColor: "lightyellow",
@@ -50,28 +47,15 @@ export default class EditTest extends Component {
                                 }}>
                                     <th >LOINC code </th>
                                     <th >Alias</th>
-                                    <th> <div className='row'>
-                                        <div className='col-2' >Action</div>  <div className='col-5' >
-                                            <input className="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" placeholder="New Alias to add"
-                                                type="text"
-                                                id="message"
-                                                name="message"
-                                                onChange={this.handleChange}
-                                                style={{
-                                                    backgroundColor: "lightpink",
-                                                    border: "2px solid blue"
-                                                }}
-                                            /></div>
-                                        <div className='col-4'>  <button onClick={() => this.props.addalias(addtest)} className="btn btn-warning" style={{
-                                            backgroundColor: "lightgreen",
-                                            border: "2px solid blue"
-                                        }}>Add Alias</button></div>
-
-                                    </div>
+                                    <th>
+                                        Action
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style={{
+                                backgroundColor: "lightyellow",
+                                border: "6px solid pink"
+                            }}>
                                 {
                                     this.props.editinfo.map(
                                         (tst, i) =>
@@ -81,11 +65,39 @@ export default class EditTest extends Component {
                                             }}>
                                                 <td>{tst.loinccode}</td>
                                                 <td >{tst.indianname}</td>
-                                                <td> <button className="btn btn-danger" onClick={() => this.props.deleteRow(tst.indianname)}>Delete it</button> </td>
+                                                <td> <button className="btn btn-danger" onClick={() => this.props.deleteRow(tst.indianname)}><img src={deletelogo} alt="Jai Hind" style={{ width: "100%", height: "25px" }} /></button> </td>
                                             </tr>
                                     )
                                 }
-
+                                <tr style={{
+                                    backgroundColor: "white",
+                                    border: "2px solid blue"
+                                }}>
+                                    <td>{this.props.editinfo[0].loinccode}</td>
+                                    <td >{ }</td>
+                                    <td>
+                                        <div className="input-group">
+                                            <input
+                                                className="form-control custom-input"
+                                                aria-label="Large"
+                                                aria-describedby="inputGroup-sizing-sm"
+                                                placeholder="New Alias to add"
+                                                type="text"
+                                                id="message"
+                                                name="message"
+                                                onChange={this.handleChange}
+                                            />
+                                            <div className="input-group-append">
+                                                <button
+                                                    onClick={() => this.props.addalias(addtest)}
+                                                    className="btn btn-warning custom-button"
+                                                >
+                                                    Add Alias
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
 
                         </table>

@@ -1,19 +1,15 @@
 import React, { Component } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from 'react';
-import { useHistory } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-// import backgr from "./images/bcgr7.jpg"
 import jwt_decode from "jwt-decode";
-import { CSVLink } from 'react-csv';
 import './component.css';
-import filebackgr from "./images/filePic.png"
+import LOINClogo from "./images/loinc-logo-tmp.png"
 import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
 import axios from 'axios';
-import './component.css';
 import Tableform from './Tableform';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import EditTest from './EditTest';
-import { useAuth0 } from '@auth0/auth0-react';
 const checkid = "http://localhost:9191/FullTest/check/";
 const editurl = "http://localhost:9191/FullTest/EditTest/";
 var tableid = 1
@@ -32,15 +28,15 @@ class TestList extends Component {
       correctid: "No"
     }
     this.BulkTesting = this.BulkTesting.bind(this);
-    this.SingleTest = this.SingleTest.bind(this);
+    this.editoperation = this.editoperation.bind(this);
+    this.addalias = this.addalias.bind(this);
+    this.handleDeleteRow = this.handleDeleteRow.bind(this);
   }
 
   BulkTesting() {
     this.props.history.push('/bulkTest/');
   }
-  SingleTest() {
-    this.props.history.push('/');
-  }
+
   handleChange = event => {
     this.stingch = event.target.value;
   };
@@ -58,29 +54,31 @@ class TestList extends Component {
     });
   };
 
-
-  editoperation = async event => {
-    console.log("The checking is proceeding");
+  editoperation = async (code) => {
+    console.log("The checking is proceeding and code is " + code);
     console.log(this.state.loginid);
-
+    this.editval = code;
     try {
       const response = await axios.get(checkid + "" + this.state.loginid);
       const correctid = response.data;
-
       console.log(this.state.loginid);
-
       if (correctid === "Yes") {
-        const res = await axios.get(editurl + "" + this.editval);
+        console.log(code + " the value is loincode ");
+        const res = await axios.get(editurl + "" + code);
         const updatedEdittestinginfo = res.data;
-
         this.setState({
           edittestinginfo: updatedEdittestinginfo,
           correctid: correctid
         }, () => {
           console.log("Updated edittestinginfo:", this.state.edittestinginfo);
-          // Now you can perform further actions with updatedEdittestinginfo
         });
-      } else {
+      }
+      else {
+        toast.error('Please log in with an authentic Gmail account', {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+        console.log("the id is not assigned")
         this.setState({ correctid: "No" });
       }
     } catch (error) {
@@ -92,15 +90,18 @@ class TestList extends Component {
     if (addtest) {
       const encodeval = encodeURIComponent(addtest);
       const loincvalue = this.editval;
+      console.log("the loiccode whose data is to be find is ==" + this.editval);
       if (loincvalue !== "") {
         axios.get("http://localhost:9191/FullTest/savetest/", {
           params: { name: encodeval, code: loincvalue }
         })
       }
+      console.log("the loiccode whose data is to be find is ==" + this.editval);
       axios.get(editurl + "" + this.editval).then((res) => {
         this.setState({ edittestinginfo: res.data });
         console.log(res.data);
       });
+      console.log("the loiccode whose data is to be find is ==" + this.editval);
     }
 
   }
@@ -131,111 +132,52 @@ class TestList extends Component {
 
     return (console.log(tableid),
       <div >
-        {/* <Loginbutton /> */}
-        <div style={{
-          backgroundSize: "contain"
-        }}>
-          {/* Csv file url */}
-          <div className='container'>
-            <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "900px", paddingRight: "20px" }}>
-              <GoogleOAuthProvider
-                clientId="572493508359-p9ecfavakbksmm6j53hei1ntot9cintk.apps.googleusercontent.com"
-                style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
-                <GoogleLogin onSuccess={credentialResponse => {
-                  var decoded = jwt_decode(credentialResponse.credential);
-                  this.setState({ loginid: decoded.email })
+        <div className="navbar">
+          <div className="nav-column">
+            <img src={LOINClogo} alt="Jai Hind" style={{ width: "100%", height: "25px" }} />
+          </div>
+          <div className="nav-column">
+            <span>FIND THE LOINC CODE FOR YOUR LAB TESTS</span>
+          </div>
+          <div className="nav-column">
+            <GoogleOAuthProvider
+              clientId="572493508359-p9ecfavakbksmm6j53hei1ntot9cintk.apps.googleusercontent.com"
+              style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+              <GoogleLogin onSuccess={credentialResponse => {
+                var decoded = jwt_decode(credentialResponse.credential);
+                this.setState({ loginid: decoded.email })
+              }}
+                onError={() => {
+                  console.log('Login Failed');
                 }}
-                  onError={() => {
-                    console.log('Login Failed');
-                  }}
-                />Login</GoogleOAuthProvider>;
-            </div>
-            <div className="container">
-              <br></br>
-              <div className="row heading-buttons">
-                <button
-                  className="btn btn-light file-button"
-                  onClick={this.BulkTesting}
-                  style={{
-                    width: '100px',
-                    height: '55px',
-                    margin: '10px 20px 5px',
-                    backgroundImage: `url(${filebackgr})`,
-                    backgroundSize: '90px 40px',
-                    backgroundPosition: 'center',
-                    // backgroundSize: 'cover',
-                    border: "4px solid blue"
-                  }}
-                >
-                </button>
-                <button
-                  className="btn btn-light single-button"
-                  onClick={this.SingleTest}
-                >
-                  Single Test
-                </button>
-              </div>
-            </div>
-
-
-            {/* Test Search part */}
-            <div className='row'>
-
-              <div className="search-bar">
-                <input
-                  className="form-control"
-                  placeholder="Search for a test..."
-                  type="text"
-                  id="message"
-                  name="message"
-                  onChange={this.handleChange}
-                />
-                <button
-                  onClick={this.handleclick}
-                  className="btn btn-warning search-button"
-                >
-                  Search
-                </button>
-              </div>
-            </div>
-
-
-
-
+              /></GoogleOAuthProvider>
           </div>
-
-          <div className="button-container">
-            <input
-              className="form-control edit-input"
-              placeholder="LOINC-Code "
-              type="text"
-              id="message"
-              name="message"
-              onChange={this.handleedit}
-            />
-
-            <button
-              onClick={this.editoperation}
-              className="btn btn-warning edit-button"
-            >
-              Add/Delete
-            </button>
+        </div>
+        <ToastContainer />
+        {/* Search bar  */}
+        <div className="search-container">
+          <div className="search-bar">
+            <input type="text" placeholder="Lab Test Name.." onChange={this.handleChange} />
+            <button onClick={this.handleclick}>Search</button>
           </div>
-
-
+          <button className="bulk-button" onClick={this.BulkTesting}>Bulk Map Tests</button>
         </div>
         <br></br>
-        <Tableform testing={this.state.testinginfo} />
+
+        <br></br>
+        {/* Catch function for showing editing table for the loincode and it should be recall from tableform */}
+        <Tableform testing={this.state.testinginfo} editoperation={this.editoperation} />
+
+
         {this.state.correctid === "Yes" ? <EditTest editinfo={this.state.edittestinginfo} deleteRow={this.handleDeleteRow} addalias={this.addalias} /> : <><p style={{
           fontSize: '18px',
           color: 'red',
           textAlign: 'center',
           margin: '20px'
         }}>
-          Please Login first to Add/Delete an Alias
+
         </p></>
         }
-
 
       </div>
     )

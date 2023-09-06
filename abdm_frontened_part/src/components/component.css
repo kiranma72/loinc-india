@@ -1,164 +1,8 @@
-.search-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: lightpink;
-    border: 2px solid blue;
-    padding: 5px 10px;
-    border-radius: 5px;
-    justify-content: flex-start;
-  }
-  
-  .form-control {
-    width: 100%;
-    border: none;
-    outline: none;
-  }
-  
-  .search-button {
-    background-color: lightgreen;
-    border: 2px solid blue;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-  
-  .search-button:hover {
-    background-color: limegreen;
-    border-color: darkblue;
-  }
-  
-  .button-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    margin-right: 10px;
-    margin-left: 200px;
-  }
-  
-  .edit-input {
-    width: 150px; /* Adjust width as needed */
-    padding: 8px;
-    background-color: #f0f0f0;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    transition: border-color 0.3s ease;
-  }
-  
-  .edit-input:focus {
-    border-color: #ff9800;
-  }
-  
-  .edit-button {
-    width: auto;
-    padding: 5px 20px;
-    background-color: #ff9800;
-    border: 4px solid #2196f3;
-    border-radius: 5px;
-    cursor: pointer;
-    animation: pulse 1s infinite;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-  
-  .edit-button:hover {
-    background-color: #ffab40;
-    border-color: #0d47a1;
-  }
-  
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-  }
-  
-
-  /* file and main page button link */
-  .heading {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  .heading-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  
-  .file-button, 
-  .single-button {
-    background: linear-gradient(to right, #66c2ff, #007bff);
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  
-  .file-button {
-    background-size: 100px;
-    width: '200px';
-    height: '200px';
-    background-image: url("./images/filePic.png");
-
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  
-  .file-button:hover,
-  .single-button:hover {
-    background: linear-gradient(to right, #007bff, #66c2ff);
-    transform: scale(1.05);
-  }
-  
-
-
-/* header css */
-
-
-  .header-container {
-    background-color: lightyellow;
-    border: 2px solid blue;
-    padding: 10px;
-    transition: background-color 0.3s;
-  }
-  
-  .header-container:hover {
-    background-color: #ffeb3b; /* Change to your desired hover color */
-  }
-  
-  .header-image {
-    width: 100%;
-    height: 60px;
-    transition: transform 0.3s;
-  }
-  
-  .header-image:hover {
-    transform: scale(1.1); /* Add a scaling effect on hover */
-  }
-  
-  .header-title {
-    font-size: 24px;
-    text-align: center;
-    margin: 0;
-    color: #333;
-    transition: color 0.3s;
-  }
-  
-  .header-title:hover {
-    color: #f44336; /* Change to your desired hover color */
-  }
-  
 
 /* Custom styles for the table */
 /* Container for the table */
 .table-container {
+    margin: 10px 20px 20px;
     max-width: 100%;
     overflow-x: auto;
   }
@@ -199,3 +43,125 @@
     }
   }
   
+
+
+
+
+/* CSS for the Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white; /* Change the background color to white */
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.nav-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333; /* Change the text color to a dark color */
+}
+
+/* Center the items within the columns */
+span {
+  margin: 5px auto ;
+  text-align: center;
+  font-weight: bold; /* Make the text bold */
+  color: #000000; /* Add color to the text */
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ff9900;
+}
+
+/* Optional: Media query for responsive design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav-column {
+    margin-bottom: 10px;
+  }
+}
+
+
+/* CSS for the SearchBar */
+.search-container {
+  display: flex;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  margin-top: 20px; /* Adjust the top margin as needed */
+}
+
+.search-bar {
+  display: flex;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px; /* Adjust the right margin for spacing */
+  width: 400px; /* Adjust the width as needed */
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.bulk-button {
+  margin-left: 30px; /* Adjust the left margin for spacing */
+}
+
+
+
+
+/* Custom CSS for the edited table */
+.edit-table-container {
+  width: fit-content;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.edit-custom-table {
+  border: 2px solid blue;
+}
+
+.edit-custom-thead th {
+  background-color: lightyellow;
+  border: 6px solid pink;
+}
+
+
+
+/* Define initial styles for the .highlight-on-hover <td> elements */
+.highlight-on-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Define styles for the hover effect on .highlight-on-hover <td> elements */
+.highlight-on-hover:hover {
+  transform: scale(1.35); /* Increase the size on hover */
+  cursor: pointer; /* Change the cursor to a pointer */
+  color: red; /* Change the text color to red on hover */
+}
+
+

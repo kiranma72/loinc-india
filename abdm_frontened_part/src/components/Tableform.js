@@ -10,37 +10,33 @@ export default class Tableform extends Component {
     }
 
     checkrange(val) {
-        if (val >= 90) { return 'bg-success'; }
+        if (val >= 90) { return 'PaleGreen'; }
         else if (val >= 50) {
-            return 'bg-warning';
+            return 'LightGoldenRodYellow';
         }
         else {
-            return 'bg-danger';
+            return 'BlanchedAlmond';
         }
     }
-    // editoperation(val) {
-    //     console.log(val);
-    //     while (ar.length > 0) { ar.pop() }
-    //     axios.get(testurl + "" + val).then((res) => {
-    //         ar.push(res.data);
-    //         // this.setState({ edittestinginfo: res.data });
-    //     });
-    //     this.state.startedit = 'ok';
-    //     console.log("new array=");
-    //     console.log(ar);
-    // }
+
     render() {
         return (
-            <div><div className="container">
+            <div>
                 {
                     this.props.testing.length !== 0 ?
                         <div className="table-container">
                             <table className="table table-bordered custom-table" >
-                                <thead className="custom-thead">
-                                    <tr className="table-info">
+                                <thead className="custom-thead" style={{
+                                    border: "6px solid black"
+                                }}>
+                                    <tr style={{
+                                        backgroundColor: "#404040",
+                                        border: "6px solid black",
+                                        color: "white",
+                                    }}>
                                         <th>Confidence (%)</th>
                                         <th >Indian name</th>
-                                        <th>LOINC code </th>
+                                        <th>LOINC code (edit) </th>
                                         <th>Component</th>
                                         <th>Property</th>
                                         <th>Time Aspct</th>
@@ -48,20 +44,24 @@ export default class Tableform extends Component {
                                         <th>Scale</th>
                                         <th>Method</th>
                                         <th>Class</th>
-                                        <th>Classtype</th>
                                         <th>Long Common Name</th>
                                         <th >Short Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody
+                                    style={{
+                                        backgroundColor: "lightyellow",
+                                        border: "6px solid black"
+                                    }}>
                                     {
                                         this.props.testing.map(
                                             (tst, i) =>
                                                 <tr key={i}
-                                                    className={this.checkrange(tst.percentage)} >
+                                                    style={{ backgroundColor: this.checkrange(tst.percentage) }}>
                                                     <td>{tst.percentage}</td>
                                                     <td>{tst.indianname}</td>
-                                                    <td>{tst.loincCode}</td>
+                                                    <td className="highlight-on-hover"
+                                                        onClick={() => this.props.editoperation(tst.loincCode)}>{tst.loincCode}</td>
                                                     <td>{tst.component}</td>
                                                     <td>{tst.property}</td>
                                                     <td>{tst.time_ASPCT}</td>
@@ -69,7 +69,6 @@ export default class Tableform extends Component {
                                                     <td>{tst.scale}</td>
                                                     <td>{tst.method}</td>
                                                     <td>{tst.class_}</td>
-                                                    <td>{tst.classtype_}</td>
                                                     <td>{tst.long_COMMON_NAME}</td>
                                                     <td>{tst.shortname_}</td>
                                                 </tr>
@@ -82,7 +81,7 @@ export default class Tableform extends Component {
                         </div>
                         : <></>
                 }
-            </div></div>
+            </div>
         )
     }
 }

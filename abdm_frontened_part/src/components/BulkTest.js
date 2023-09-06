@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
+import LOINClogo from "./images/loinc-logo-tmp.png"
 import axios from 'axios';
+import dragdroppic from "./images/upload.png"
 import { CSVLink } from 'react-csv';
-
 const headers = [
   { label: "Confidence (%)", key: "percentage" },
   { label: "Name Provided", key: "checkingName" },
@@ -20,21 +21,24 @@ const headers = [
   { label: "Short Name", key: "shortname_" },
 ];
 
-const testurl = "http://localhost:9191/FullTest/bulktest";
 var testdata = [];
 function BulkTest() {
   const [tests, setTests] = useState([]);
   const handleFile = async (event) => {
-    Papa.parse(event.target.files[0], {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (result) => {
-        const valuesArray = result.data.map((d) => Object.values(d).join(''));
-        const newTests = await Promise.all(valuesArray.map(onSearchClick));
-        csvdataPrep(newTests);
-        setTests(newTests);
-      }
-    });
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile) {
+      Papa.parse(event.target.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (result) => {
+          const valuesArray = result.data.map((d) => Object.values(d).join(''));
+          const newTests = await Promise.all(valuesArray.map(onSearchClick));
+          csvdataPrep(newTests);
+          setTests(newTests);
+        }
+      });
+    }
   };
   const csvdataPrep = (alltests) => {
     for (let t = 0; t < alltests.length; t++) {
@@ -44,34 +48,54 @@ function BulkTest() {
     }
   }
 
+
   const onSearchClick = async (testValue) => {
     const encodeval = encodeURIComponent(testValue);
     const response = await axios.get("http://localhost:9191/FullTest/bulktest/", { params: { name: encodeval } });
     return response.data;
   };
   const checkrange = (val) => {
-    if (val >= 90) { return 'bg-success'; }
+    if (val >= 90) { return 'PaleGreen'; }
     else if (val >= 50) {
-      return 'bg-warning';
+      return 'LightGoldenRodYellow';
     }
     else {
-      return 'bg-danger';
+      return 'BlanchedAlmond';
     }
   }
   return (
     <div className="App">
-      <div className='row'>
-        <input type='file' name='file' accept='.csv' onChange={handleFile}
-          style={{ display: "block", margin: "10px 180px 20px ", border: "4px solid blue", backgroundColor: "lightgreen" }}>
-        </input>
-        <CSVLink data={testdata} headers={headers} filename="TestResults.csv" style={{ margin: "1px 10px auto", backgroundColor: "lightgreen" }} >
-          <button className="btn btn-primary mb-2">Download CSV File </button>
-        </CSVLink></div>
+      <div className="navbar" style={{ width: '100%' }}>
+        <div className="nav-column">
+          <img src={LOINClogo} alt="Jai Hind" style={{ width: "100%", height: "25px" }} />
+        </div>
+        <div className="nav-column">
+          <span>BULK TEST MAPPING</span>
+        </div>
+        <div className="nav-column">
+          <CSVLink data={testdata} headers={headers} filename="TestResults.csv" style={{ backgroundColor: "lightgreen" }}>
+            <button className="btn btn-primary mb-2">Download CSV File</button>
+          </CSVLink>
+        </div>
+      </div>
+      <div className="container" style={{ margin: '25px auto ' }}>
+        <div className="row">
+          <div className="col-md-9 d-flex justify-content-left align-items-center">
+            <input id="inputtag" type='file' name='file' accept='.csv' onChange={handleFile} style={{
+              justifyContent: 'center',
+            }}></input>
+          </div>
+
+
+        </div>
+      </div>
       <table className="table table-bordered" style={{ margin: "10px auto" }}>
         <thead>
-          <tr className="table-info" style={{
-            backgroundColor: "red",
-            border: "6px solid pink"
+          <tr style={{
+            backgroundColor: "transparent",
+            border: "3px solid black",
+            color: "black",
+
           }}>
             <th>Confidence (%)</th>
             <th >Name Provided</th>
@@ -92,7 +116,7 @@ function BulkTest() {
         </thead>
         <tbody>
           {tests.map((val, index) => (
-            val.map((value, i) => (<tr key={i} className={checkrange(value.percentage)}>
+            val.map((value, i) => (<tr key={i} style={{ backgroundColor: checkrange(value.percentage) }}>
               <td>{value.percentage}</td>
               <td>{value.checkingName}</td>
               <td key={index}>{value.indianname}</td>

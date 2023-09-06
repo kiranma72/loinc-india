@@ -35,7 +35,6 @@ import com.example.MapIt.tests.IDstore;
 import com.example.MapIt.tests.LoincTest;
 import com.example.MapIt.tests.SearchClass;
 
-
 @CrossOrigin
 @RestController
 @RequestMapping("/FullTest")
@@ -270,6 +269,12 @@ public class FullTestOutputController {
 	    		 bt.setTIME_ASPCT(ft.getTIME_ASPCT());
 	    		 ans.add(bt);
 	    		 }
+	    	 if(ans.size()>2) {
+	    		 List<BulkTest>ans1=new ArrayList<>();
+	    		 ans1.add(ans.get(0));
+	    		 ans1.add(ans.get(1));
+	    		 return ans1;
+	    	 }
 	    	 return ans;
 	     }
 	  
